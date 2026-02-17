@@ -93,8 +93,11 @@
                         liff.closeWindow(); 
                     }).catch(() => liff.closeWindow());
                 } else {
-                    alert('報名成功！');
-                    liff.closeWindow();
+                    alert('🎉 報名成功！\n\n感謝您的預約，請點擊確定返回對話視窗。');
+// 確保 alert 執行完畢（使用者按了確定）後，再關閉視窗
+setTimeout(function(){
+    liff.closeWindow();
+}, 100);
                 }
             } catch (e) {
                 alert('系統錯誤：' + e);
