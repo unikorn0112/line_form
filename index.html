@@ -10,12 +10,16 @@
         .container { max-width: 500px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin: auto; }
         .btn-primary { background-color: #00b900; border: none; font-weight: bold; margin-top: 20px; }
         label { font-weight: bold; margin-top: 15px; }
+        .name-hint { font-size: 0.8em; color: #ff4d4d; font-weight: normal; }
     </style>
 </head>
 <body>
     <div class="container">
         <h3 class="text-center mb-4">全齡溫養課程報名</h3>
-        <div class="form-group"><label>姓名 <span style="font-size: 0.8em; color: #666;">(請填寫真實大名，以利核對)</span></label><input type="text" id="userName" class="form-control"></div>
+        <div class="form-group">
+            <label>姓名 <span class="name-hint">(請填寫正確大名，方便核對)</span></label>
+            <input type="text" id="userName" class="form-control">
+        </div>
         <div class="form-group"><label>電話</label><input type="tel" id="userPhone" class="form-control" placeholder="請輸入聯絡電話"></div>
         <div class="form-group">
             <label>報名課程</label>
@@ -34,12 +38,14 @@
         </div>
         <button id="submitBtn" class="btn btn-primary btn-block">確認提交</button>
     </div>
+
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <script>
         const dateMap = {
             "500": ["3/3 (二) 19:30 ~ 21:30", "3/21 (六) 10:00 ~ 12:00"],
             "2980": ["3/22 (日) 19:30 ~ 21:30"]
         };
+
         function updateDates() {
             const price = document.getElementById('courseType').value;
             const dateSelect = document.getElementById('courseDate');
@@ -50,6 +56,7 @@
                 dateSelect.appendChild(opt);
             });
         }
+
         let uID = "";
         async function initLIFF() {
             try {
@@ -76,6 +83,7 @@
             this.disabled = true;
 
             try {
+                // 發送資料給 GAS
                 await fetch('https://script.google.com/macros/s/AKfycbw_EPUH4-FnKPxtLTZSh6mPh18ptD9pbEDH47tvWHcBIJ5v7Eaw99CHS7BSSMbDwvc/exec', {
                     method: 'POST',
                     mode: 'no-cors',
@@ -85,20 +93,20 @@
                     })
                 });
                 
-   if (liff.isInClient()) {
-    // 1. 先發送訊息
-    liff.sendMessages([{
-        'type': 'text',
-        'text': (method === 'line pay' ? 'line pay 付款資訊' : '報名完成，請給我匯款資訊')
-    }]).then(() => {
-        // 2. 發送成功後才彈窗，這會阻斷執行
-        alert('報名成功\n\n感謝您的報名\n\n請點擊『確定』返回對話視窗');
-        // 3. 使用者按了確定後，才執行關閉
-        liff.closeWindow();
-    }).catch((err) => {
-        console.error(err);
-        liff.closeWindow();
-    });
+                // 顯示成功彈窗 (三行格式)
+                alert('報名成功\n\n感謝您的報名\n\n請點擊〔確定〕返回對話視窗');
+                
+                // 關閉視窗
+                if (liff.isInClient()) {
+                    liff.closeWindow();
+                } else {
+                    window.close();
+                }
+            } catch (e) {
+                alert('系統錯誤：' + e);
+                this.disabled = false;
+            }
+        };
     </script>
 </body>
 </html>
