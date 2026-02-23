@@ -100,4 +100,41 @@
 
             try {
                 // 1. 發送資料給 GAS 存檔
-                await fetch('
+                await fetch('https://script.google.com/macros/s/AKfycbw_EPUH4-FnKPxtLTZSh6mPh18ptD9pbEDH47tvWHcBIJ5v7Eaw99CHS7BSSMbDwvc/exec', {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({
+                        userId: uID, 
+                        userName: name, 
+                        phone: phone,
+                        payMethod: method, 
+                        activity: (price === "500" ? "體驗班" : "精修班") + "(" + date + ")", 
+                        price: price
+                    })
+                });
+
+                // 2. 如果選 LINE Pay，讓學員手機主動發出關鍵字 (右邊氣泡)
+                if (method === "line pay" && liff.isInClient()) {
+                    await liff.sendMessages([{
+                        'type': 'text',
+                        'text': 'line pay 付款資訊'
+                    }]);
+                }
+                
+                // 3. 顯示成功彈窗 (三行格式)
+                alert('報名成功\n\n感謝您的報名\n\n請點擊〔確定〕返回對話視窗');
+                
+                // 4. 關閉視窗
+                if (liff.isInClient()) {
+                    liff.closeWindow();
+                } else {
+                    window.close();
+                }
+            } catch (e) {
+                alert('系統錯誤：' + e);
+                this.disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>
