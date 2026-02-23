@@ -85,18 +85,20 @@
                     })
                 });
                 
-               // ✅ 替換後的乾淨版本
-if (liff.isInClient()) {
-    // 1. 直接顯示您要求的三行格式彈窗
-    alert('報名成功\n\n感謝您的報名\n\n請點擊〔確定〕返回對話視窗');
-    
-    // 2. 使用者點擊「確定」後，才執行關閉
-    liff.closeWindow();
-} else {
-    // 外部瀏覽器邏輯
-    alert('報名成功\n\n感謝您的報名\n\n請點擊〔確定〕返回對話視窗');
-    window.close();
-}
+   if (liff.isInClient()) {
+    // 1. 先發送訊息
+    liff.sendMessages([{
+        'type': 'text',
+        'text': (method === 'line pay' ? 'line pay 付款資訊' : '報名完成，請給我匯款資訊')
+    }]).then(() => {
+        // 2. 發送成功後才彈窗，這會阻斷執行
+        alert('報名成功\n\n感謝您的報名\n\n請點擊『確定』返回對話視窗');
+        // 3. 使用者按了確定後，才執行關閉
+        liff.closeWindow();
+    }).catch((err) => {
+        console.error(err);
+        liff.closeWindow();
+    });
     </script>
 </body>
 </html>
