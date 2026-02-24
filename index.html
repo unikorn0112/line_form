@@ -40,13 +40,7 @@
             <select id="courseDate" class="form-control"></select>
         </div>
 
-        <div class="form-group">
-            <label>付款方式</label>
-            <select id="payMethod" class="form-control">
-                <option value="line pay">使用 LINE Pay</option>
-                <option value="轉帳匯款">轉帳匯款</option>
-            </select>
-        </div>
+        <input type="hidden" id="payMethod" value="轉帳匯款">
 
         <button id="submitBtn" class="btn btn-primary btn-block">確認提交</button>
     </div>
@@ -91,7 +85,7 @@
         document.getElementById('submitBtn').onclick = async function() {
             const name = document.getElementById('userName').value;
             const phone = document.getElementById('userPhone').value;
-            const method = document.getElementById('payMethod').value;
+            const method = document.getElementById('payMethod').value; // 這裡會固定取得 "轉帳匯款"
             const price = document.getElementById('courseType').value;
             const date = document.getElementById('courseDate').value;
 
@@ -99,7 +93,6 @@
             this.disabled = true;
 
             try {
-                // 1. 發送資料給 GAS 存檔
                 await fetch('https://script.google.com/macros/s/AKfycbw_EPUH4-FnKPxtLTZSh6mPh18ptD9pbEDH47tvWHcBIJ5v7Eaw99CHS7BSSMbDwvc/exec', {
                     method: 'POST',
                     mode: 'no-cors',
@@ -113,18 +106,10 @@
                     })
                 });
 
-                // 2. 如果選 LINE Pay，讓學員手機主動發出關鍵字 (右邊氣泡)
-                if (method === "line pay" && liff.isInClient()) {
-                    await liff.sendMessages([{
-                        'type': 'text',
-                        'text': 'line pay 付款資訊'
-                    }]);
-                }
+                // 註記：刪除了原本判斷 LINE Pay 並發送關鍵字的程式碼 (liff.sendMessages)
                 
-                // 3. 顯示成功彈窗 (三行格式)
                 alert('報名成功\n\n感謝您的報名\n\n請點擊〔確定〕返回對話視窗');
                 
-                // 4. 關閉視窗
                 if (liff.isInClient()) {
                     liff.closeWindow();
                 } else {
